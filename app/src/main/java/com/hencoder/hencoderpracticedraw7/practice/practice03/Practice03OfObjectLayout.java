@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
@@ -40,7 +41,7 @@ public class Practice03OfObjectLayout extends RelativeLayout {
             public void onClick(View v) {
                 ObjectAnimator animator = ObjectAnimator.ofObject(view, "position",
                         new PointFEvaluator(), new PointF(0, 0), new PointF(1, 1));
-                animator.setInterpolator(new LinearInterpolator());
+                animator.setInterpolator(new OvershootInterpolator());
                 animator.setDuration(1000);
                 animator.start();
             }
@@ -48,11 +49,17 @@ public class Practice03OfObjectLayout extends RelativeLayout {
     }
 
     private class PointFEvaluator implements TypeEvaluator<PointF> {
+        PointF newPoint = new PointF();
 
         // 重写 evaluate() 方法，让 PointF 可以作为属性来做动画
         @Override
         public PointF evaluate(float fraction, PointF startValue, PointF endValue) {
-            return startValue;
+            float x = startValue.x + (fraction * (endValue.x - startValue.x));
+            float y = startValue.y + (fraction * (endValue.y - startValue.y));
+
+            newPoint.set(x, y);
+
+            return newPoint;
         }
     }
 }
